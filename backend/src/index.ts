@@ -16,6 +16,9 @@ const wsServer = new WebSocketServer({
   autoAcceptConnections: false,
 });
 
+// Keep track of connected clients
+const connections: any[] = [];
+
 function originIsAllowed(origin) {
   // put logic here to detect whether the specified origin is allowed.
   return true;
@@ -33,20 +36,49 @@ wsServer.on("request", function (request) {
 
   var connection = request.accept("echo-protocol", request.origin);
   console.log(new Date() + " Connection accepted.");
+
+  // Add the new connection to the list
+  connections.push(connection);
+
   connection.on("message", function (message) {
     if (message.type === "utf8") {
       console.log("Received Message: " + message.utf8Data);
-      connection.sendUTF(message.utf8Data);
+
+      // Broadcast the message to all connected clients
+      broadcast(message.utf8Data);
     } else if (message.type === "binary") {
       console.log(
         "Received Binary Message of " + message.binaryData.length + " bytes"
       );
-      connection.sendBytes(message.binaryData);
+
+      // Broadcast the binary message to all connected clients
+      broadcastBytes(message.binaryData);
     }
   });
+
   connection.on("close", function (reasonCode, description) {
     console.log(
       new Date() + " Peer " + connection.remoteAddress + " disconnected."
     );
+
+    // Remove the closed connection from the list
+    const index = connections.indexOf(connection);
+    if (index !== -1) {
+      connections.splice(index, 1);
+    }
   });
 });
+
+// Function to broadcast a UTF-8 message to all connected clients
+function broadcast(message: string) {
+  connections.forEach(function (client) {
+    client.sendUTF(message);
+  });
+}
+
+// Function to broadcast binary data to all connected clients
+function broadcastBytes(data: Buffer) {
+  connections.forEach(function (client) {
+    client.sendBytes(data);
+  });
+}
