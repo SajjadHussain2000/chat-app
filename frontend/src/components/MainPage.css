@@ -1,0 +1,70 @@
+.chat-section-wapper {
+  display: flex;
+  padding: 10%;
+  gap: 0 10px;
+  height: 100vh;
+}
+
+.profileSection {
+  display: flex;
+  align-items: center;
+  gap: 0 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.profileSection:last-child {
+  margin-bottom: 0;
+}
+
+.profileSection:hover {
+  background: rgb(192, 190, 190);
+}
+
+.section1 {
+  color: black;
+  width: 20%;
+  border: 2px solid black;
+  padding: 1%;
+  overflow: hidden auto;
+}
+
+.section2 {
+  color: black;
+  width: 100%;
+  border: 2px solid black;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px;
+}
+
+img.profile-pic-img {
+  height: 50px;
+  border-radius: 50%;
+}
+
+p.user-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+input[type="text"] {
+  width: 80%;
+}
+
+.inputMessageSection {
+  display: flex;
+  justify-content: space-between;
+}
+
+button.send-btn {
+  width: 15%;
+  padding: 10px;
+}
+
+.messageSection {
+  overflow: auto;
+}

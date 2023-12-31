@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import MainPage from "./components/MainPage";
 
 const App = () => {
   const [messages, setMessages] = useState([]);
@@ -39,25 +40,7 @@ const App = () => {
   };
 
   return (
-    <main className="chats-wrapper">
-      <div className="chats">
-        <ul>
-          <li>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore
-            sapiente voluptates, nihil itaque iusto quidem quia consequatur,
-            velit quas, error harum perspiciatis cupiditate dolores vel officia
-            quod maiores expedita fuga.
-          </li>
-        </ul>
-      </div>
-      <div className="chat-input-wrapper">
-        <input
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-        />
-        <button onClick={sendMessage}>Send</button>
-      </div>
-    </main>
+    <MainPage/>
   );
 };
 

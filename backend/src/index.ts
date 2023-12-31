@@ -35,7 +35,9 @@ wsServer.on("request", function (request) {
   }
 
   var connection = request.accept("echo-protocol", request.origin);
-  console.log(new Date() + " Connection accepted.");
+  console.log(
+    new Date() + " Connection accepted with peer :" + connection.remoteAddress
+  );
 
   // Add the new connection to the list
   connections.push(connection);
