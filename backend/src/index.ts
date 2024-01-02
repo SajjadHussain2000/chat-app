@@ -76,7 +76,7 @@ function sendToOne(clientAddress: string, message: string) {
   const client = connections[clientAddress];
   if (client) {
     client.connection.sendUTF(
-      JSON.stringify({ message, messageType: "MESSAGE" })
+      JSON.stringify({ message: message, messageType: "MESSAGE" })
     );
   }
 }
