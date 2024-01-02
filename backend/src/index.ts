@@ -75,7 +75,9 @@ wsServer.on("request", function (request) {
 function sendToOne(clientAddress: string, message: string) {
   const client = connections[clientAddress];
   if (client) {
-    client.connection.sendUTF({ message, messageType: "MESSAGE" });
+    client.connection.sendUTF(
+      JSON.stringify({ message, messageType: "MESSAGE" })
+    );
   }
 }
 
