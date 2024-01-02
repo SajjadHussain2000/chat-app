@@ -22,7 +22,7 @@ const MainPage = () => {
     webSocketService.addEventListener("message", (event): any => {
       const parsedData = JSON.parse(event.data);
       if(parsedData.messageType==='USER_DATA')
-        setUserList(JSON.parse(event.data));
+        setUserList(parsedData.users);
       console.log(event);
       // setMessages((prev)=>([...prev,event.data]));
     });
