@@ -74,9 +74,8 @@ wsServer.on("request", function (request) {
 // Function to send a UTF-8 message to a specific connected client
 function sendToOne(clientAddress: string, message: string) {
   const client = connections[clientAddress];
-  console.log("debug ", client);
   if (client) {
-    client.connection.sendUTF(message);
+    client.connection.sendUTF({ message, messageType: "MESSAGE" });
   }
 }
 
@@ -86,7 +85,9 @@ function broadcast() {
     return { name: connections[ele].name, id: ele };
   });
   Object.keys(connections).forEach(function (client) {
-    connections[client].connection.sendUTF(JSON.stringify(allConnections));
+    connections[client].connection.sendUTF(
+      JSON.stringify({ users: allConnections, messageType: "USER_DATA" })
+    );
   });
 }
 
