@@ -1,0 +1,9 @@
+{
+    "messageType": "USER_DATA",
+    "users": [
+        {
+            "name": "Sajjad Hussain",
+            "id": "1"
+        }
+    ]
+}

@@ -1,22 +1,26 @@
 import React, { useEffect, useState } from "react";
+import users from '../Data/dummyUser.json'
 import "./MainPage.css";
 
 const MainPage = () => {
-  const [messages, setMessages] = useState([]);
+  const [userList, setUserList] = useState<{id:string,name:string}[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [txt, setTxt] = useState("");
   const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string|number|null>(null);
   useEffect(() => {
     const webSocketService = new WebSocket(
       "ws://localhost:8080/",
       "echo-protocol"
     );
-
+    
     webSocketService.addEventListener("open", () => {
-      console.log("connected");
+      webSocketService.send(JSON.stringify(users));
+      console.log("connected ");
     });
 
-    webSocketService.addEventListener("message", (event) => {
+    webSocketService.addEventListener("message", (event):any => {
+      setUserList(JSON.parse(event.data));
       console.log(event);
       // setMessages((prev)=>([...prev,event.data]));
     });
@@ -35,7 +39,7 @@ const MainPage = () => {
   const sendMessage = (e: any) => {
     e.preventDefault();
       if (socket && txt) {
-      socket.send(newMessage);
+        socket.send(JSON.stringify({ content:newMessage,recipient:selectedUserId,messageType:'MESSAGE'}));
       const msgEle = document.getElementById("message-section");
       const newMessageText = document.createElement("p");
       newMessageText.innerHTML = newMessage;
@@ -44,26 +48,26 @@ const MainPage = () => {
       setNewMessage("");
     }
   };
+  
+  const onUserSelectHandler = (id:number|string|null) => {
+    setSelectedUserId(id);
+  }
 
   return (
     <main className="chat-section-wapper">
       <section className="section1">
-        <div className="profileSection">
-          <img
-            src="/profile-pic.avif"
-            alt="profile pic"
-            className="profile-pic-img"
-          />
-          <p className="user-name">User 1</p>
-        </div>
-        <div className="profileSection">
-          <img
-            src="/profile-pic.avif"
-            alt="profile pic"
-            className="profile-pic-img"
-          />
-          <p className="user-name">User 2kvjgkuvutkuc</p>
-        </div>
+        {
+          userList.map((ele) => {
+            return (<div className="profileSection" key={ele.id} onClick={()=>onUserSelectHandler(ele.id)}>
+              <img
+                src="/profile-pic.avif"
+                alt="profile pic"
+                className="profile-pic-img"
+              />
+              <p className="user-name">{ele.name}</p>
+            </div>);
+          })
+        }
       </section>
       <section className="section2">
         <div className="messageSection" id="message-section">

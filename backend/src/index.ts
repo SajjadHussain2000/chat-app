@@ -17,7 +17,7 @@ const wsServer = new WebSocketServer({
 });
 
 // Keep track of connected clients
-const connections: any[] = [];
+const connections: { [key: string]: any } = {};
 
 function originIsAllowed(origin) {
   // put logic here to detect whether the specified origin is allowed.
@@ -25,36 +25,39 @@ function originIsAllowed(origin) {
 }
 
 wsServer.on("request", function (request) {
-  if (!originIsAllowed(request.origin)) {
-    // Make sure we only accept requests from an allowed origin
-    request.reject();
-    console.log(
-      new Date() + " Connection from origin " + request.origin + " rejected."
-    );
-    return;
-  }
+  // ... (existing code)
 
   var connection = request.accept("echo-protocol", request.origin);
   console.log(
     new Date() + " Connection accepted with peer :" + connection.remoteAddress
   );
 
-  // Add the new connection to the list
-  connections.push(connection);
-
   connection.on("message", function (message) {
     if (message.type === "utf8") {
       console.log("Received Message: " + message.utf8Data);
 
-      // Broadcast the message to all connected clients
-      broadcast(message.utf8Data);
+      // Parse the message to extract recipient and content
+      const parsedMessage = JSON.parse(message.utf8Data);
+      if (parsedMessage.messageType === "USER_DATA") {
+        connections[parsedMessage.users[0].id] = {
+          connection,
+          name: parsedMessage.users[0].name,
+        };
+        broadcast();
+      } else if (parsedMessage.messageType === "MESSAGE") {
+        const recipient = parsedMessage.recipient;
+        const content = parsedMessage.content;
+
+        // Send the message to the specified recipient
+        console.log("debug ", parsedMessage);
+        sendToOne(recipient, content);
+      }
     } else if (message.type === "binary") {
       console.log(
         "Received Binary Message of " + message.binaryData.length + " bytes"
       );
 
-      // Broadcast the binary message to all connected clients
-      broadcastBytes(message.binaryData);
+      // Handle binary messages if needed
     }
   });
 
@@ -64,17 +67,26 @@ wsServer.on("request", function (request) {
     );
 
     // Remove the closed connection from the list
-    const index = connections.indexOf(connection);
-    if (index !== -1) {
-      connections.splice(index, 1);
-    }
+    delete connections[connection.remoteAddress];
   });
 });
 
+// Function to send a UTF-8 message to a specific connected client
+function sendToOne(clientAddress: string, message: string) {
+  const client = connections[clientAddress];
+  console.log("debug ", client);
+  if (client) {
+    client.connection.sendUTF(message);
+  }
+}
+
 // Function to broadcast a UTF-8 message to all connected clients
-function broadcast(message: string) {
-  connections.forEach(function (client) {
-    client.sendUTF(message);
+function broadcast() {
+  const allConnections = Object.keys(connections).map((ele) => {
+    return { name: connections[ele].name, id: ele };
+  });
+  Object.keys(connections).forEach(function (client) {
+    connections[client].connection.sendUTF(JSON.stringify(allConnections));
   });
 }
 
