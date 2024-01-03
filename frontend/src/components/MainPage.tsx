@@ -7,7 +7,8 @@ const MainPage = () => {
   const [newMessage, setNewMessage] = useState("");
   const [txt, setTxt] = useState("");
   const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [selectedUserId, setSelectedUserId] = useState<string|number|null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | number | null>(null);
+  const [messageList, setMessageList] = useState<{message:string}[]>([]);
   useEffect(() => {
     const webSocketService = new WebSocket(
       "ws://localhost:8080/",
@@ -23,8 +24,10 @@ const MainPage = () => {
       console.log(event);
       
       const parsedData = JSON.parse(event.data);
-      if(parsedData.messageType==='USER_DATA')
+      if (parsedData.messageType === 'USER_DATA')
         setUserList(parsedData.users);
+      else if(parsedData.messageType === 'MESSAGE')
+        setMessageList((prev)=>[...prev,{ message:parsedData.message }]);
       // setMessages((prev)=>([...prev,event.data]));
     });
 
@@ -52,7 +55,8 @@ const MainPage = () => {
     }
   };
   
-  const onUserSelectHandler = (id:number|string|null) => {
+  const onUserSelectHandler = (id: number | string | null) => {
+    setMessageList([]);
     setSelectedUserId(id);
   }
 
@@ -74,7 +78,11 @@ const MainPage = () => {
       </section>
       <section className="section2">
         <div className="messageSection" id="message-section">
-          <p className="message">Hello! How are you?</p>
+          {
+            messageList.map(ele => {
+              return  <p className="message">ele.message</p>
+            })
+          }
         </div>
         <div className="inputMessageSection">
           <input
